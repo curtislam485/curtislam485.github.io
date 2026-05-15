@@ -1,6 +1,559 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Curt — Electrical Engineer</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0f0e;
+      --surface:   #131613;
+      --border:    #1f2420;
+      --text:      #d4d9d4;
+      --muted:     #5a6359;
+      --accent:    #7fff6a;
+      --accent2:   #3be8b0;
+      --font-mono: 'DM Mono', monospace;
+      --font-serif:'Instrument Serif', serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* subtle grid texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13,15,14,0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+      text-decoration: none;
+    }
+
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 48px 80px;
+      max-width: 900px;
+    }
+
+    .hero-tag {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-tag::before {
+      content: '';
+      display: inline-block;
+      width: 32px; height: 1px;
+      background: var(--accent);
+    }
+
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(48px, 7vw, 96px);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      color: #e8ede8;
+      margin-bottom: 32px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent2);
+    }
+
+    .hero-desc {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 48px;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0d0f0e;
+      border: 1px solid var(--accent);
+    }
+    .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+    /* ── SECTION WRAPPER ── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 100px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      max-width: 120px;
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 400;
+      color: #e8ede8;
+      margin-bottom: 56px;
+      line-height: 1.15;
+    }
+
+    /* ── PROJECTS GRID ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--border);
+    }
+
+    .project-card {
+      background: var(--surface);
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border: 1px solid transparent;
+      transition: border-color 0.2s, background 0.2s;
+      cursor: pointer;
+    }
+    .project-card:hover {
+      border-color: var(--accent);
+      background: #141714;
+    }
+
+    .project-tag {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent2);
+    }
+
+    .project-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 400;
+      color: #e8ede8;
+      line-height: 1.25;
+    }
+
+    .project-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.75;
+      flex: 1;
+    }
+
+    .project-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .chip {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 2px;
+    }
+
+    .project-arrow {
+      font-size: 18px;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      align-self: flex-end;
+    }
+    .project-card:hover .project-arrow { opacity: 1; transform: translate(4px, -4px); }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .about-text p {
+      color: var(--muted);
+      line-height: 1.85;
+      margin-bottom: 20px;
+    }
+
+    .about-text p strong { color: var(--text); font-weight: 500; }
+
+    .skills-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .skill-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skill-name { color: var(--text); font-size: 13px; }
+
+    .skill-bar {
+      width: 120px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .skill-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+    }
+
+    /* ── CONTACT ── */
+    .contact-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      padding: 12px 20px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 28px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── FADE IN ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-tag   { animation: fadeUp 0.6s ease both; animation-delay: 0.1s; }
+    .hero h1    { animation: fadeUp 0.6s ease both; animation-delay: 0.2s; }
+    .hero-desc  { animation: fadeUp 0.6s ease both; animation-delay: 0.35s; }
+    .hero-cta   { animation: fadeUp 0.6s ease both; animation-delay: 0.5s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      nav { padding: 16px 24px; }
+      .nav-links { gap: 20px; }
+      .hero, section { padding-left: 24px; padding-right: 24px; }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
 <body>
-Let's do pranks!
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#">Curt</a>
+    <ul class="nav-links">
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Electrical Engineer</div>
+    <h1>Building circuits<br>that <em>actually work.</em> (Work in progress)</h1>
+    <p class="hero-desc">
+      I design and prototype analog, power, and mixed-signal systems — from schematic to tested hardware.
+      I care about getting the physics right and understanding why things fail.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#projects">View Projects</a>
+      <a class="btn btn-ghost" href="#contact">Get in Touch</a>
+    </div>
+  </div>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-label">Work</div>
+    <h2 class="section-title">Selected Projects</h2>
+
+    <div class="projects-grid">
+
+      <div class="project-card">
+        <div class="project-tag">Analog · 2024</div>
+        <div class="project-title">Low-Noise Instrumentation Amplifier</div>
+        <p class="project-desc">
+          Designed a 3-op-amp INA for ECG signal acquisition. Achieved input-referred noise of 8 nV/√Hz
+          at 1 kHz with 80 dB CMRR. Matched simulation to bench within 1 dB across 10 Hz–10 kHz.
+        </p>
+        <div class="project-meta">
+          <span class="chip">LTspice</span>
+          <span class="chip">PCB Layout</span>
+          <span class="chip">Noise Analysis</span>
+        </div>
+        <div class="project-arrow">↗</div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-tag">Power · 2024</div>
+        <div class="project-title">Synchronous Buck Converter</div>
+        <p class="project-desc">
+          12V→3.3V, 5A converter with >92% peak efficiency. Focused on minimizing switching losses and
+          thermal management. Characterized efficiency curves across load and input voltage range.
+        </p>
+        <div class="project-meta">
+          <span class="chip">Gate Drive</span>
+          <span class="chip">Thermal Design</span>
+          <span class="chip">MOSFET Selection</span>
+        </div>
+        <div class="project-arrow">↗</div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-tag">Embedded · 2023</div>
+        <div class="project-title">FPGA-Based Arbitrary Waveform Generator</div>
+        <p class="project-desc">
+          Implemented a 12-bit, 100 MSPS DDS core in VHDL on an Artix-7. Paired with a custom PCB
+          output stage and SPI interface for waveform configuration from a host microcontroller.
+        </p>
+        <div class="project-meta">
+          <span class="chip">VHDL</span>
+          <span class="chip">Xilinx Artix-7</span>
+          <span class="chip">DDS</span>
+        </div>
+        <div class="project-arrow">↗</div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-tag">RF · 2023</div>
+        <div class="project-title">2.4 GHz Patch Antenna Array</div>
+        <p class="project-desc">
+          Designed and fabricated a 2×2 patch array on FR4 for a sensor node application.
+          Measured gain of 8.2 dBi and -10 dB bandwidth of 85 MHz. Compared simulated vs.
+          measured S-parameters using a VNA.
+        </p>
+        <div class="project-meta">
+          <span class="chip">HFSS</span>
+          <span class="chip">VNA Measurement</span>
+          <span class="chip">FR4</span>
+        </div>
+        <div class="project-arrow">↗</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-label">About</div>
+    <h2 class="section-title">Background &amp; Skills</h2>
+
+    <div class="about-grid">
+      <div class="about-text">
+        <p>
+          I'm an electrical engineer with a focus on <strong>analog and mixed-signal design</strong>.
+          I got into EE because I wanted to understand how physical systems actually behave —
+          not just simulate them, but build them and see where theory meets reality.
+        </p>
+        <p>
+          My design process starts with the physics. Before touching a schematic I want to
+          understand the fundamental constraints: noise floors, thermal limits, bandwidth-power
+          tradeoffs. The circuit follows from that, not the other way around.
+        </p>
+        <p>
+          I'm currently studying at the <strong>University of Illinois Urbana-Champaign</strong>
+          and looking for internship and research opportunities in analog or power electronics.
+        </p>
+      </div>
+
+      <div>
+        <div class="skills-list">
+          <div class="skill-row">
+            <span class="skill-name">Analog Circuit Design</span>
+            <div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">PCB Layout (KiCad/Altium)</span>
+            <div class="skill-bar"><div class="skill-fill" style="width:80%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">SPICE Simulation</span>
+            <div class="skill-bar"><div class="skill-fill" style="width:85%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">Power Electronics</span>
+            <div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">VHDL / FPGA</span>
+            <div class="skill-bar"><div class="skill-fill" style="width:65%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">Lab Instruments (scope, VNA, SA)</span>
+            <div class="skill-bar"><div class="skill-fill" style="width:88%"></div></div>
+          </div>
+          <div class="skill-row">
+            <span class="skill-name">Python / MATLAB</span>
+            <div class="skill-bar"><div class="skill-fill" style="width:70%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-label">Contact</div>
+    <h2 class="section-title">Get in Touch</h2>
+    <div class="contact-row">
+      <a class="contact-link" href="mailto:you@email.com">
+        <span>✉</span> you@email.com
+      </a>
+      <a class="contact-link" href="https://linkedin.com/in/yourhandle" target="_blank">
+        <span>in</span> LinkedIn
+      </a>
+      <a class="contact-link" href="https://github.com/yourhandle" target="_blank">
+        <span>⌥</span> GitHub
+      </a>
+      <a class="contact-link" href="resume.pdf" target="_blank">
+        <span>↓</span> Resume (PDF)
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2025 Curt</span>
+    <span>Electrical Engineer · Champaign, IL</span>
+  </footer>
+
 </body>
 </html>
